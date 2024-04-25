@@ -1,0 +1,2 @@
+casa#matri#int
+estudiantes#nombre#string#id#int#departamento#string
