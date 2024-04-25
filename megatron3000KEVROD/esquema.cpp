@@ -86,13 +86,6 @@ void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstr
     if (compararTipoDeDato(datosCsv, datosEsquema)) {
         std::ofstream archivoTxt(archivo + ".txt");
 
-        for (int i = 0; i < titulos_columnas.size(); ++i) {
-            archivoTxt << titulos_columnas[i];
-            if (i < titulos_columnas.size() - 1) {
-                archivoTxt << "#"; // Separar por #
-            }
-        }
-        archivoTxt << "\n";
         for (const auto& fila : datosCsv) {
             for (size_t i = 0; i < fila.size(); ++i) {
                 archivoTxt << fila[i];
