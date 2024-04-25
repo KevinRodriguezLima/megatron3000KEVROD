@@ -9,8 +9,13 @@
 
 class Esquema {
 public:
+	//bloque 1
 	void leerCsv_esquema(std::string& archivo);
+	int existeRelacion(const std::string& archivo, std::ifstream& esquemaTxt);
 	void validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstream& esquemaTxt, int numerolinea, std::string& archivo);
 	bool compararTipoDeDato(std::vector<std::vector<std::string>>& datosCsv, std::vector<std::string>& datosEsquema);
-	std::string parseType(const std::string& str);
+	std::string saberTipoDato(const std::string& str);
+
+	//bloque de consultas
+
 };

@@ -1,3 +1,4 @@
-Juan#156#CS#
-Pedro#157#CS#
-Maria#158#EE#
+nombre#id#departamento
+Juan#156#CS
+Pedro#157#CS
+Maria#158#EE

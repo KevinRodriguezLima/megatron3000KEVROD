@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="esquema.h" />
     <ClInclude Include="MenteMaestra.h" />
+    <ClInclude Include="ProcesadorConsultas.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
