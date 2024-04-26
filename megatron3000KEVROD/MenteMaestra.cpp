@@ -55,43 +55,29 @@ void Megatron::leerConsulta() {
     }
 }
 bool Megatron::esQuery(std::vector<std::string>& palabras) {
-    std::string consulta = "";
-    for (const auto& palabra : palabras) {
-        consulta += palabra + " ";
-    }
-    std::cout << "Consulta construida: " << consulta << std::endl;
 
-    if (palabras.size() < 6 || palabras[0] != "&" || palabras[1] != "SELECT") {
+    if (palabras.size() < 3 || palabras[0] != "&" || palabras[1] != "SELECT") {
         std::cout << "La consulta no comienza con '& SELECT'." << std::endl;
         return false;
     }
-
-    // Paso 2: Verificar los atributos o el asterisco después de "SELECT"
-    if (palabras[2] != "*" && palabras.size() < 6) {
+    if (palabras[2] != "*" && palabras.size() < 4) {
         std::cout << "Faltan atributos después de 'SELECT'." << std::endl;
         return false;
     }
-
-    // Paso 3: Verificar que la consulta contenga "FROM" después de los atributos
     auto from_pos = std::find(palabras.begin(), palabras.end(), "FROM");
     if (from_pos == palabras.end()) {
         std::cout << "No se encontró 'FROM' en la consulta." << std::endl;
         return false;
     }
-
-    // Paso 4: Verificar que haya un nombre de tabla después de "FROM"
     if (std::distance(from_pos, palabras.end()) < 2) {
         std::cout << "Falta el nombre de la tabla después de 'FROM'." << std::endl;
         return false;
     }
-
-    // Paso 5: Verificar que la consulta termine con '#'
     if (palabras.back() != "#") {
         std::cout << "La consulta no termina con '#'." << std::endl;
         return false;
     }
 
-    // Si la consulta pasa todas las verificaciones, es válida
     return true;
 
 
@@ -109,10 +95,35 @@ bool Megatron::esQuery(std::vector<std::string>& palabras) {
 }
     
 void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
-    /*std::regex pattern("&\s*SELECT\s+(\*|\w+)\s+FROM\s+\w+\s*#");
-    if (std::regex_match(texto, pattern)) {
-        imprimir(palabras[2], palabras[4]);
-    }*/
+    std::string tabla;
+    auto from_pos = std::find(palabras.begin(), palabras.end(), "FROM");
+    if (from_pos != palabras.end() && std::distance(from_pos, palabras.end()) >= 2) {
+        tabla = *(from_pos + 1); // El nombre de la tabla está después de "FROM"
+        std::cout << "Nombre de la relacion"<<tabla;
+    }
+    else {
+        std::cout << "No se pudo obtener el nombre de la tabla." << std::endl;
+        return;
+    }
+
+    std::ifstream esquemaTxt("esquema.txt");
+    std::string linea;
+    int numeroLinea = 0;
+    while (std::getline(esquemaTxt, linea)) {
+        ++numeroLinea;
+        std::istringstream ss(linea);
+        std::string palabra;
+        if (std::getline(ss, palabra, '#')) {
+            if (palabra == tabla) {
+                std::cout << "Coincidencia encontrada en la linea " << numeroLinea << std::endl;
+                break;
+            }
+        }
+    }
+
+    
+
+
 }
 void Megatron::imprimir(std::string& palabra1, std::string& palabra2) {
     std::ifstream esquemaTxt("esquema.txt");
