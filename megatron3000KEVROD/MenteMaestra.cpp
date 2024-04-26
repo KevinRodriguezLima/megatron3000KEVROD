@@ -106,6 +106,29 @@ void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
         return;
     }
 
+    std::vector<std::string> titulos;
+    auto select_pos = std::find(palabras.begin(), palabras.end(), "SELECT");
+    auto from_pos2 = std::find(palabras.begin(), palabras.end(), "FROM");
+    if (select_pos != palabras.end() && from_pos2 != palabras.end() && select_pos < from_pos2) {
+        auto start_it = select_pos + 1;
+        auto end_it = from_pos2;
+        while (start_it != end_it) {
+
+            std::istringstream ss(*start_it);
+            std::string titulo;
+            while (std::getline(ss, titulo, ',')) {
+
+                titulo.erase(titulo.find_last_not_of(" \t\n\r\f\v") + 1);
+                titulo.erase(0, titulo.find_first_not_of(" \t\n\r\f\v"));
+                titulos.push_back(titulo);
+            }
+            ++start_it;
+        }
+    }
+
+    std::vector<std::string> atributos;
+
+
     std::ifstream esquemaTxt("esquema.txt");
     std::string linea;
     int numeroLinea = 0;
@@ -116,13 +139,66 @@ void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
         if (std::getline(ss, palabra, '#')) {
             if (palabra == tabla) {
                 std::cout << "Coincidencia encontrada en la linea " << numeroLinea << std::endl;
+                std::string atributo;
+                while (std::getline(ss, atributo, '#')) {
+                    if (atributo != tabla && atributo != "string" && atributo != "int" && atributo != "float") {
+                        atributos.push_back(atributo);
+                    }
+                }
                 break;
             }
         }
     }
+    //ubique la linea ahora que era? xd
+    std::cout << "Titulos de las columnas:" << std::endl;
+    for (const auto& titulo : titulos) {
+        std::cout << "- " << titulo << "   -   ";
+    }
 
+    /*std::cout << "ATRIBUTOS TOTALES:" << std::endl;
+    for (const auto& titulo : atributos) {
+        std::cout << "- " << titulo << std::endl;
+    }*/
     
+    //hallar posiciones
+    std::vector<int> posiciones;
 
+    for (size_t i = 0; i < titulos.size(); ++i) {
+        for (size_t j = 0; j < atributos.size(); ++j) {
+            if (titulos[i] == atributos[j]) {
+                posiciones.push_back(j + 1);
+                break; 
+            }
+        }
+    }
+
+    // Imprimir las coincidencias encontradas
+    /*std::cout << "Coincidencias encontradas:" << std::endl;
+    for (size_t i = 0; i < titulos.size(); ++i) {
+        std::cout << "Columna: " << titulos[i];
+        if (i < posiciones.size()) {
+            std::cout << ", Posicion en atributos: " << posiciones[i];
+        }
+        std::cout << std::endl;
+    }*/
+    //imprimir daots
+    std::cout <<std::endl<<"---------------------------"<< std::endl;
+    std::ifstream archivoTabla(tabla + ".txt");
+    std::string lineaTabla;
+    while (std::getline(archivoTabla, lineaTabla)) {
+        std::istringstream ss(lineaTabla);
+        std::vector<std::string> columnas;
+        std::string columna;
+        while (std::getline(ss, columna, '#')) {
+            columnas.push_back(columna);
+        }
+        for (int pos : posiciones) {
+            
+            std::cout << columnas[pos - 1];
+            std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
 
 }
 void Megatron::imprimir(std::string& palabra1, std::string& palabra2) {

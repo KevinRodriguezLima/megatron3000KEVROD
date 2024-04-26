@@ -96,9 +96,7 @@ void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstr
             archivoTxt << "\n";
         }
 
-        // Cerrar el archivo de texto
         archivoTxt.close();
-        std::cout << "Se ha creado el archivo de texto \"" << archivo + ".txt" << "\" con éxito." << std::endl;
     }
 
     titulos_columnas.clear();
@@ -115,10 +113,8 @@ std::string Esquema::saberTipoDato(const std::string& str) {
         }
     }
     catch (const std::invalid_argument&) {
-        // La cadena no es un número válido como int
     }
     catch (const std::out_of_range&) {
-        // El número es demasiado grande para un int
     }
 
     try {
@@ -126,10 +122,8 @@ std::string Esquema::saberTipoDato(const std::string& str) {
         return "float";
     }
     catch (const std::invalid_argument&) {
-        // La cadena no es un número válido como float
     }
     catch (const std::out_of_range&) {
-        // El número es demasiado grande para un float
     }
 
     return "string"; // Si no es ni int ni float, entonces es string
@@ -138,7 +132,6 @@ std::string Esquema::saberTipoDato(const std::string& str) {
 bool Esquema::compararTipoDeDato(std::vector<std::vector<std::string>>& datosCsv, std::vector<std::string>& datosEsquema) {
     bool verificar = true;
     for (const auto& fila : datosCsv) {
-        // Iterar sobre cada elemento de la fila
         for (int i = 0; i < fila.size(); ++i) {
             std::cout << fila[i] + " -" + saberTipoDato(fila[i]) + " . " + datosEsquema[((i + 1) * 2)] << std::endl;
             if (saberTipoDato(fila[i]) != datosEsquema[((i + 1) * 2)]) {
