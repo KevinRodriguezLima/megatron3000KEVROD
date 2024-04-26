@@ -1,8 +1,6 @@
 #include "MenteMaestra.h";
 
-
 Megatron::Megatron(const std::string& archivo) : archivo_1(archivo) {}
-
 Megatron::~Megatron() {}
 
 void Megatron::iniciar() {
@@ -38,60 +36,83 @@ void Megatron::leerConsulta() {
             std::cout << "Saliendo de la consulta..." << std::endl;
             break;
         }
-        else if (esQuery(texto)) {
-            std::cout << "Consulta válida: " << texto << std::endl;
-            ejecutarQuery(texto);
-            // Procesar la consulta
-        }
         else {
-            std::cout << "Consulta incorrecta. Inténtelo de nuevo." << std::endl;
+            std::istringstream iss(texto);
+            std::vector<std::string> palabras;
+            std::string palabra;
+            while (iss >> palabra) {
+                palabras.push_back(palabra);
+            }
+
+            if (esQuery(palabras)) {
+                std::cout << "Consulta válida: " << texto << std::endl;
+                ejecutarQuery(palabras);
+            }
+            else {
+                std::cout << "Consulta incorrecta. Inténtelo de nuevo." << std::endl;
+            }
         }
     }
 }
-bool Megatron::esQuery(std::string& texto) {
-    std::istringstream iss(texto);
-    std::vector<std::string> palabras;
-    std::string palabra;
+bool Megatron::esQuery(std::vector<std::string>& palabras) {
+    std::string consulta = "";
+    for (const auto& palabra : palabras) {
+        consulta += palabra + " ";
+    }
+    std::cout << "Consulta construida: " << consulta << std::endl;
 
-    while (iss >> palabra) {
-        palabras.push_back(palabra);
-    }
-
-    if (palabras.size() < 6) {
+    if (palabras.size() < 6 || palabras[0] != "&" || palabras[1] != "SELECT") {
+        std::cout << "La consulta no comienza con '& SELECT'." << std::endl;
         return false;
     }
 
-    if (palabras[0] != "&") {
+    // Paso 2: Verificar los atributos o el asterisco después de "SELECT"
+    if (palabras[2] != "*" && palabras.size() < 6) {
+        std::cout << "Faltan atributos después de 'SELECT'." << std::endl;
         return false;
     }
-    if (palabras[1] != "SELECT") {
+
+    // Paso 3: Verificar que la consulta contenga "FROM" después de los atributos
+    auto from_pos = std::find(palabras.begin(), palabras.end(), "FROM");
+    if (from_pos == palabras.end()) {
+        std::cout << "No se encontró 'FROM' en la consulta." << std::endl;
         return false;
     }
-    if (palabras[3] != "FROM") {
+
+    // Paso 4: Verificar que haya un nombre de tabla después de "FROM"
+    if (std::distance(from_pos, palabras.end()) < 2) {
+        std::cout << "Falta el nombre de la tabla después de 'FROM'." << std::endl;
         return false;
     }
+
+    // Paso 5: Verificar que la consulta termine con '#'
     if (palabras.back() != "#") {
+        std::cout << "La consulta no termina con '#'." << std::endl;
         return false;
     }
-    return true;
-    /*std::regex pattern("&\s*SELECT\s+(\*|\w+)\s+FROM\s+\w+\s*#");
 
-    // Verificar si la cadena coincide con el patrón
-    return std::regex_match(texto, pattern);*/
+    // Si la consulta pasa todas las verificaciones, es válida
+    return true;
+
+
+    //intento con expresiones regulares
+
+    /*std::string consulta = "";
+    for (const auto& palabra : palabras) {
+        consulta += palabra + " ";
+    }
+    std::cout << "Consulta construida: " << consulta << std::endl;
+    std::regex pattern("&\\s*SELECT\\s+(\\*|\\w+(\\s*,\\s*\\w+)*)\\s+FROM\\s+\\S+\\s*#");
+    bool resultado = std::regex_match(consulta, pattern);
+    */
+
 }
     
-void Megatron::ejecutarQuery(std::string& texto) {
-    std::istringstream iss(texto);
-    std::vector<std::string> palabras;
-    std::string palabra;
-
-    while (iss >> palabra) {
-        palabras.push_back(palabra);
-    }
-    std::regex pattern("&\s*SELECT\s+(\*|\w+)\s+FROM\s+\w+\s*#");
+void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
+    /*std::regex pattern("&\s*SELECT\s+(\*|\w+)\s+FROM\s+\w+\s*#");
     if (std::regex_match(texto, pattern)) {
         imprimir(palabras[2], palabras[4]);
-    }
+    }*/
 }
 void Megatron::imprimir(std::string& palabra1, std::string& palabra2) {
     std::ifstream esquemaTxt("esquema.txt");
