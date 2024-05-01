@@ -40,7 +40,7 @@ int Esquema::existeRelacion(const std::string& archivo, std::ifstream& esquemaTx
 
 void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstream& esquemaTxt, int numerolinea, std::string& archivo) {
     //validar tipo de dato wazaaaa
-    std::vector<std::string> titulos_columnas;
+
     std::vector<std::vector<std::string>> datosCsv;
     std::vector<std::string> datosEsquema;
 
@@ -48,19 +48,36 @@ void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstr
     std::string lineaCsv;
     int contadorLinea = 0;
     while (std::getline(archivoCsv, lineaCsv)) {
-        if (contadorLinea == 0) { // titulos
-            std::istringstream ss(lineaCsv);
-            std::string dato;
-            while (std::getline(ss, dato, ',')) {
-                titulos_columnas.push_back(dato);
-            }
-        }
-        else { // datos
+        if (contadorLinea != 0) { // Ignorar la primera línea (títulos)
             std::vector<std::string> fila;
             std::istringstream ss(lineaCsv);
-            std::string dato;
-            while (std::getline(ss, dato, ',')) {
-                fila.push_back(dato);
+            std::string campo;
+
+            while (std::getline(ss, campo, ',')) {
+                // Si el campo comienza con comillas
+                if (campo.front() == '"') {
+                    // Eliminar la primera comilla
+                    campo.erase(campo.begin());
+                    // Concatenar campos hasta encontrar una comilla al final
+                    std::string temp;
+                    bool dentroComillas = true;
+                    temp += campo;
+                    while (std::getline(ss, campo, ',')) {
+                        temp += "," + campo;
+                        // Si el campo termina con comillas
+                        if (campo.back() == '"') {
+                            // Eliminar la última comilla
+                            temp.pop_back();
+                            dentroComillas = false;
+                            break;
+                        }
+                    }
+                    // Añadir el campo corregido a la fila
+                    fila.push_back(temp);
+                }
+                else { // Si el campo no comienza con comillas
+                    fila.push_back(campo);
+                }
             }
             datosCsv.push_back(fila);
         }
@@ -87,7 +104,7 @@ void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstr
         std::ofstream archivoTxt(archivo + ".txt");
 
         for (const auto& fila : datosCsv) {
-            for (size_t i = 0; i < fila.size(); ++i) {
+            for (int i = 0; i < fila.size(); ++i) {
                 archivoTxt << fila[i];
                 if (i < fila.size() - 1) {
                     archivoTxt << "#"; // Separar por #
@@ -99,7 +116,6 @@ void Esquema::validarTipoDato_crearArchivo(std::ifstream& archivoCsv, std::ifstr
         archivoTxt.close();
     }
 
-    titulos_columnas.clear();
     datosEsquema.clear();
     datosCsv.clear();
 }

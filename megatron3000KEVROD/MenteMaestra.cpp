@@ -21,7 +21,7 @@ void Megatron::iniciar() {
             break;
         }
         else {
-            std::cout << "Comando incorrecto. Inténtelo de nuevo." << std::endl;
+            std::cout << "Comando incorrecto. Inténtelo de nuevo, si quiere salir escriba QUIT o quit " << std::endl;
         }
     }
 }
@@ -80,25 +80,13 @@ bool Megatron::esQuery(std::vector<std::string>& palabras) {
 
     return true;
 
-
-    //intento con expresiones regulares
-
-    /*std::string consulta = "";
-    for (const auto& palabra : palabras) {
-        consulta += palabra + " ";
-    }
-    std::cout << "Consulta construida: " << consulta << std::endl;
-    std::regex pattern("&\\s*SELECT\\s+(\\*|\\w+(\\s*,\\s*\\w+)*)\\s+FROM\\s+\\S+\\s*#");
-    bool resultado = std::regex_match(consulta, pattern);
-    */
-
 }
     
 void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
     std::string tabla;
     auto from_pos = std::find(palabras.begin(), palabras.end(), "FROM");
     if (from_pos != palabras.end() && std::distance(from_pos, palabras.end()) >= 2) {
-        tabla = *(from_pos + 1); // El nombre de la tabla está después de "FROM"
+        tabla = *(from_pos + 1); // Porque el nombre de la tabla está después de "FROM"
         std::cout << "Nombre de la relacion"<<tabla;
     }
     else {
@@ -210,10 +198,4 @@ void Megatron::ejecutarQuery(std::vector<std::string>& palabras) {
             std::cout << std::endl;
         }
     }
-    
-
-}
-void Megatron::imprimir(std::string& palabra1, std::string& palabra2) {
-    std::ifstream esquemaTxt("esquema.txt");
-    std::cout << "funciona";
 }
